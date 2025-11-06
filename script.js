@@ -37,13 +37,7 @@
     Z: [[1,1,0],[0,1,1]],
   };
   const COLORS = {
-    I: '#60a5fa', // azul
-    J: '#c084fc', // roxo
-    L: '#f59e0b', // laranja
-    O: '#fde047', // amarelo
-    S: '#34d399', // verde
-    T: '#f472b6', // rosa
-    Z: '#ef4444', // vermelho
+    I: '#60a5fa', J: '#c084fc', L: '#f59e0b', O: '#fde047', S: '#34d399', T: '#f472b6', Z: '#ef4444'
   };
 
   // Tabuleiro
@@ -64,8 +58,7 @@
   // Estado de jogo
   let dropCounter = 0;
   let level = 1, score = 0, linesClearedThisLevel = 0;
-  // Velocidade: começa bem devagar
-  const SPEEDS = [1000, 850, 700, 600, 520, 450, 390, 340, 300, 260, 230, 200];
+  const SPEEDS = [1000, 850, 700, 600, 520, 450, 390, 340, 300, 260, 230, 200]; // começa devagar
   function currentSpeed(){ return SPEEDS[Math.min(level-1, SPEEDS.length-1)]; }
 
   function updateSidebar(){
@@ -76,7 +69,6 @@
   }
 
   function rotate(matrix){
-    // Rotação 90°: transpose + reverse rows
     const M = matrix.map((r,i)=>r.map((_,j)=>matrix[matrix.length-1-j][i]));
     return M;
   }
@@ -87,7 +79,7 @@
         if(!p.shape[y][x]) continue;
         const nx = p.x + x;
         const ny = p.y + y;
-        if(ny < 0) continue; // acima da tela ainda
+        if(ny < 0) continue;
         if(nx < 0 || nx >= COLS || ny >= ROWS) return true;
         if(b[ny][nx]) return true;
       }
@@ -116,14 +108,10 @@
       }
     }
     if(lines>0){
-      // Pontuação simples: +100 por linha, bônus por múltiplas
       const add = lines === 1 ? 100 : lines === 2 ? 250 : lines === 3 ? 450 : 700;
       score += add * level;
       linesClearedThisLevel += lines;
-      // Sobe de nível a cada 5 linhas completas
-      while(linesClearedThisLevel >= 5){
-        level++; linesClearedThisLevel -= 5;
-      }
+      while(linesClearedThisLevel >= 5){ level++; linesClearedThisLevel -= 5; }
       updateSidebar();
     }
   }
@@ -133,26 +121,18 @@
     if(!type) return;
     const color = COLORS[type];
     const px = x*BLOCK, py = y*BLOCK;
-    // bloco com brilho
     ctx.fillStyle = color; ctx.fillRect(px,py,BLOCK,BLOCK);
     ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.strokeRect(px+0.5,py+0.5,BLOCK-1,BLOCK-1);
-    // highlight
     ctx.fillStyle = 'rgba(255,255,255,.18)';
     ctx.fillRect(px+2,py+2,BLOCK-4,Math.floor(BLOCK/3));
   }
   function drawBoard(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    for(let y=0; y<ROWS; y++){
-      for(let x=0; x<COLS; x++){
-        drawCell(x,y,board[y][x]);
-      }
-    }
+    for(let y=0; y<ROWS; y++) for(let x=0; x<COLS; x++) drawCell(x,y,board[y][x]);
     if(cur){
       for(let y=0; y<cur.shape.length; y++){
         for(let x=0; x<cur.shape[y].length; x++){
-          if(cur.shape[y][x] && cur.y + y >= 0){
-            drawCell(cur.x + x, cur.y + y, cur.type);
-          }
+          if(cur.shape[y][x] && cur.y + y >= 0) drawCell(cur.x + x, cur.y + y, cur.type);
         }
       }
     }
@@ -161,12 +141,14 @@
     nctx.clearRect(0,0,nextCanvas.width,nextCanvas.height);
     const s = next.shape;
     const w = s[0].length, h = s.length;
-    const offx = Math.floor((4 - w) * (BLOCK/2) / 2);
-    const offy = Math.floor((4 - h) * (BLOCK/2) / 2);
+    const cell = Math.floor(nextCanvas.width / 4); // cabe no 64x64
+    const offx = Math.floor((nextCanvas.width - w*cell)/2);
+    const offy = Math.floor((nextCanvas.height - h*cell)/2);
     for(let y=0;y<h;y++) for(let x=0;x<w;x++) if(s[y][x]){
       nctx.fillStyle = COLORS[next.type];
-      nctx.fillRect(offx + x*24, offy + y*24, 24, 24);
-      nctx.strokeStyle = 'rgba(0,0,0,.25)'; nctx.strokeRect(offx + x*24+0.5, offy + y*24+0.5, 23, 23);
+      nctx.fillRect(offx + x*cell, offy + y*cell, cell, cell);
+      nctx.strokeStyle = 'rgba(0,0,0,.25)';
+      nctx.strokeRect(offx + x*cell + .5, offy + y*cell + .5, cell-1, cell-1);
     }
   }
 
@@ -188,32 +170,21 @@
     drawNext();
   }
   function showOverlay(title, btn){
-    overlay.innerHTML = `<div class=\"overlay-content\"><h2>${title}</h2><button id=\"btnOverlay\" class=\"primary\">${btn}</button></div>`;
+    overlay.innerHTML = `<div class="overlay-content"><h2>${title}</h2><button id="btnOverlay" class="primary">${btn}</button></div>`;
     overlay.style.display = 'grid';
     document.getElementById('btnOverlay').onclick = () => { overlay.style.display='none'; reset(); running=true; paused=false; animate(0); };
   }
 
-  function hardDrop(){
-    let moved = 0;
-    while(!collide(board, {...cur, y: cur.y+1})) { cur.y++; moved++; }
-    score += 2 * moved; // bonus
-    lock();
-  }
-  function softDrop(){
-    if(!collide(board, {...cur, y: cur.y+1})) { cur.y++; score += 1; }
-    else lock();
-  }
+  function hardDrop(){ let moved = 0; while(!collide(board, {...cur, y: cur.y+1})) { cur.y++; moved++; } score += 2*moved; lock(); }
+  function softDrop(){ if(!collide(board, {...cur, y: cur.y+1})) { cur.y++; score += 1; } else lock(); }
   function move(dx){ if(!collide(board, {...cur, x: cur.x+dx})) cur.x += dx; }
   function rotateCur(){
-    const rotated = rotate(cur.shape);
-    const trial = {...cur, shape: rotated};
+    const rotated = rotate(cur.shape); const trial = {...cur, shape: rotated};
     if(!collide(board, trial)) cur.shape = rotated;
-    else if(!collide(board, {...trial, x: cur.x-1})) cur.x-=1, cur.shape=rotated;
-    else if(!collide(board, {...trial, x: cur.x+1})) cur.x+=1, cur.shape=rotated;
+    else if(!collide(board, {...trial, x: cur.x-1})) { cur.x-=1; cur.shape=rotated; }
+    else if(!collide(board, {...trial, x: cur.x+1})) { cur.x+=1; cur.shape=rotated; }
   }
-  function lock(){
-    merge(board, cur); clearLines(); spawn();
-  }
+  function lock(){ merge(board, cur); clearLines(); spawn(); }
 
   function animate(time){
     if(!running) return;
@@ -230,22 +201,28 @@
 
   // Controles teclado
   addEventListener('keydown', (e) => {
-    if(!running) return;
+    if(e.key === 'm' || e.key === 'M'){ toggleMusic(); return; }
+    if(e.key === 'p' || e.key === 'P'){ togglePause(); return; }
+    if(!running) return; // só movimenta quando estiver rodando
     if(e.key === 'ArrowLeft') move(-1);
     else if(e.key === 'ArrowRight') move(1);
     else if(e.key === 'ArrowUp' || e.key==='x' || e.key==='X') rotateCur();
     else if(e.key === 'ArrowDown') softDrop();
     else if(e.key === ' '){ e.preventDefault(); hardDrop(); }
-    else if(e.key === 'p' || e.key === 'P'){ togglePause(); }
-    else if(e.key === 'm' || e.key === 'M'){ toggleMusic(); }
   });
 
-  // Controles toque/botões
+  // Controles toque/pointer: maior compatibilidade
+  function bindPointer(el, handler){
+    el.addEventListener('pointerdown', (e)=>{ e.preventDefault(); handler(); });
+    el.addEventListener('click', (e)=>{ e.preventDefault(); handler(); });
+  }
   document.querySelectorAll('.ctrl').forEach(btn => {
-    btn.addEventListener('click', () => handleAction(btn.dataset.action));
-    btn.addEventListener('touchstart', (e)=>{e.preventDefault(); handleAction(btn.dataset.action)}, {passive:false});
+    const a = btn.dataset.action;
+    bindPointer(btn, () => handleAction(a));
   });
   function handleAction(a){
+    // se ainda não iniciou, começa e aplica primeira ação
+    if(!running){ startGame(); }
     if(a==='left') move(-1);
     else if(a==='right') move(1);
     else if(a==='rotate') rotateCur();
@@ -276,6 +253,5 @@
   btnMusic.addEventListener('click', toggleMusic);
   btnPause.addEventListener('click', togglePause);
 
-  // Início: mostrar overlay
   overlay.style.display = 'grid';
 })();
