@@ -21,9 +21,8 @@
     </header>
 
     <main class="layout">
-      <!-- Painel lateral com informações -->
       <aside class="sidebar" aria-label="Painel de informações do jogo">
-        <div class="card">
+        <div class="card status-card">
           <h2>Status</h2>
           <ul class="stats">
             <li><strong>Nível:</strong> <span id="level">1</span></li>
@@ -38,21 +37,17 @@
         </div>
       </aside>
 
-      <!-- Área de jogo -->
       <section class="stage-wrap">
         <div class="stage-shadow"></div>
         <canvas id="game" width="300" height="600" aria-label="Área de jogo Tetris" role="img"></canvas>
         <div class="overlay" id="overlay">
-          <div class="overlay-content">
-            <h2>Toque para começar</h2>
-            <p>Use as setas do teclado (ou botões abaixo) para jogar.</p>
+          <div class="overlay-content only-button">
             <button id="btnStart" class="primary">Começar</button>
           </div>
         </div>
       </section>
     </main>
 
-    <!-- Controles de toque (mobile) -->
     <nav class="controls" aria-label="Controles do jogo">
       <button class="ctrl" data-action="left" aria-label="Esquerda">⬅️<small>Esq</small></button>
       <button class="ctrl" data-action="rotate" aria-label="Girar">🔄<small>Girar</small></button>
@@ -68,7 +63,6 @@
     </footer>
   </div>
 
-  <!-- Áudio: coloque seu arquivo em ./assets/music.mp3 (ou na mesma pasta) -->
   <audio id="bgm" loop preload="auto">
     <source src="assets/music.mp3" type="audio/mpeg">
     <source src="music.mp3" type="audio/mpeg">
