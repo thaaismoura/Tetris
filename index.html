@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tetris – Thaís Moura</title>
+  <meta name="description" content="Tetris responsivo para PC e celular. Créditos: Thaís Moura." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Dica: troque por fonte exportada do Canva via @font-face no style.css -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1 class="brand">Tetris <span>Thaís Moura</span></h1>
+      <div class="audio-controls">
+        <button id="btnMusic" class="pill" aria-pressed="false" title="Música (M)">🎵 Música</button>
+        <button id="btnPause" class="pill" aria-pressed="false" title="Pausar (P)">⏸️ Pausa</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- Painel lateral com informações -->
+      <aside class="sidebar" aria-label="Painel de informações do jogo">
+        <div class="card">
+          <h2>Status</h2>
+          <ul class="stats">
+            <li><strong>Nível:</strong> <span id="level">1</span></li>
+            <li><strong>Velocidade:</strong> <span id="speed">Lenta</span></li>
+            <li><strong>Pontuação:</strong> <span id="score">0</span></li>
+            <li><strong>Linhas p/ subir:</strong> <span id="linesToNext">5</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Próxima Peça</h2>
+          <canvas id="nextCanvas" width="96" height="96" aria-label="Pré-visualização da próxima peça"></canvas>
+        </div>
+        <div class="card note">
+          <p>Complete <strong>5 linhas</strong> para avançar de nível. Cada nível aumenta a velocidade.</p>
+        </div>
+      </aside>
+
+      <!-- Área de jogo -->
+      <section class="stage-wrap">
+        <div class="stage-shadow"></div>
+        <canvas id="game" width="300" height="600" aria-label="Área de jogo Tetris" role="img"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="overlay-content">
+            <h2>Toque para começar</h2>
+            <p>Use as setas do teclado (ou botões abaixo) para jogar.</p>
+            <button id="btnStart" class="primary">Começar</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Controles de toque (mobile) -->
+    <nav class="controls" aria-label="Controles do jogo">
+      <button class="ctrl" data-action="left" aria-label="Esquerda">⬅️<small>Esq</small></button>
+      <button class="ctrl" data-action="rotate" aria-label="Girar">🔄<small>Girar</small></button>
+      <button class="ctrl" data-action="right" aria-label="Direita">➡️<small>Dir</small></button>
+      <button class="ctrl" data-action="soft" aria-label="Acelerar">⬇️<small>Acelera</small></button>
+      <button class="ctrl" data-action="hard" aria-label="Queda rápida">⏬<small>Queda</small></button>
+      <button class="ctrl" data-action="pause" aria-label="Pausar">⏸️<small>Pausa</small></button>
+      <button class="ctrl" data-action="music" aria-label="Música">🎵<small>Música</small></button>
+    </nav>
+
+    <footer class="footer">
+      <p>© <span id="year"></span> <strong>Thaís Moura</strong>. Todos os direitos reservados.</p>
+    </footer>
+  </div>
+
+  <!-- Áudio: coloque seu arquivo em ./assets/music.mp3 (ou na mesma pasta) -->
+  <audio id="bgm" loop preload="auto">
+    <source src="assets/music.mp3" type="audio/mpeg">
+    <source src="music.mp3" type="audio/mpeg">
+    Seu navegador não suporta áudio HTML5.
+  </audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
